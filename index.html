@@ -258,7 +258,7 @@
 </div>
 
 <script>
-const questions = [
+const allQuestions = [
   {
     id: "q1",
     prompt: "In PAN-OS, what is the primary purpose of a 'Security Zone'?",
@@ -384,29 +384,39 @@ let current = 0;
 let score = 0;
 let answered = false;
 const responses = [];
+let activeQuestions = shuffle(allQuestions);
 
 const quizCard = document.getElementById('quizCard');
 const progressFill = document.getElementById('progressFill');
 
+function shuffle(array) {
+  const copy = array.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 function renderQuestion() {
   answered = false;
-  const q = questions[current];
-  progressFill.style.width = ((current) / questions.length * 100) + '%';
+  const q = activeQuestions[current];
+  progressFill.style.width = ((current) / activeQuestions.length * 100) + '%';
 
   quizCard.innerHTML = `
     <div class="question-meta">
-      <span>Question ${current + 1} of ${questions.length}</span>
+      <span>Question ${current + 1} of ${activeQuestions.length}</span>
       <span>Score: ${score}</span>
     </div>
     <p class="prompt">${q.prompt}</p>
     <div class="options" id="optionsWrap">
-      ${q.options.map(o => `<button class="option" data-id="${o.id}">${o.text}</button>`).join('')}
+      ${shuffle(q.options).map(o => `<button class="option" data-id="${o.id}">${o.text}</button>`).join('')}
     </div>
     <button class="hint-btn" id="hintBtn">Show hint</button>
     <p class="hint-text" id="hintText">${q.hint || ''}</p>
     <div class="feedback" id="feedback"></div>
     <div class="nav-row">
-      <button class="next-btn" id="nextBtn">${current === questions.length - 1 ? 'See results' : 'Next question'}</button>
+      <button class="next-btn" id="nextBtn">${current === activeQuestions.length - 1 ? 'See results' : 'Next question'}</button>
     </div>
   `;
 
@@ -421,7 +431,7 @@ function renderQuestion() {
 
   document.getElementById('nextBtn').addEventListener('click', () => {
     current++;
-    if (current < questions.length) {
+    if (current < activeQuestions.length) {
       renderQuestion();
     } else {
       renderResults();
@@ -432,7 +442,7 @@ function renderQuestion() {
 function selectAnswer(choiceId) {
   if (answered) return;
   answered = true;
-  const q = questions[current];
+  const q = activeQuestions[current];
   const isCorrect = choiceId === q.correct;
   if (isCorrect) score++;
 
@@ -455,16 +465,16 @@ function selectAnswer(choiceId) {
   feedback.innerHTML = `<strong>${isCorrect ? (q.correctFeedback || "That's right.") : (q.incorrectFeedback || "Not quite.")}</strong>${q.explanation}${docLinkHtml}`;
 
   document.getElementById('nextBtn').classList.add('show');
-  progressFill.style.width = ((current + 1) / questions.length * 100) + '%';
+  progressFill.style.width = ((current + 1) / activeQuestions.length * 100) + '%';
 }
 
 function renderResults() {
   progressFill.style.width = '100%';
-  const pct = Math.round((score / questions.length) * 100);
+  const pct = Math.round((score / activeQuestions.length) * 100);
   quizCard.innerHTML = `
     <div class="results">
       <h2>Quiz complete</h2>
-      <div class="score">${score} / ${questions.length}</div>
+      <div class="score">${score} / ${activeQuestions.length}</div>
       <p>${pct}% correct</p>
       <button class="restart-btn" id="restartBtn">Try again</button>
       <div class="review-list">
@@ -480,6 +490,7 @@ function renderResults() {
     current = 0;
     score = 0;
     responses.length = 0;
+    activeQuestions = shuffle(allQuestions);
     renderQuestion();
   });
 }
