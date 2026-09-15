@@ -151,6 +151,18 @@
     display: block;
     margin-bottom: 4px;
   }
+  .feedback a.doc-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--accent);
+    font-size: 0.88rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+  }
+  .feedback a.doc-link:hover {
+    color: var(--accent-dark);
+    border-color: var(--accent-dark);
+  }
   .nav-row {
     display: flex;
     justify-content: flex-end;
@@ -260,7 +272,9 @@ const questions = [
     explanation: "Security zones group interfaces (physical, VLAN, tunnel, etc.) so that traffic can be controlled based on the zone it enters (source) and exits (destination) via security policy rules.",
     hint: "Think about how traffic is grouped before policy is applied.",
     correctFeedback: "Exactly right!",
-    incorrectFeedback: "Not quite."
+    incorrectFeedback: "Not quite.",
+    docUrl: "https://docs.paloaltonetworks.com/ngfw/administration/zone-protection-and-dos-protection/how-do-zones-protect-the-network",
+    docLabel: "How Do Zones Protect the Network? — PAN-OS docs"
   },
   {
     id: "q2",
@@ -275,7 +289,9 @@ const questions = [
     explanation: "App-ID uses multiple identification techniques (signatures, decryption, decoding, heuristics) to determine the exact application traversing the network, independent of port or protocol.",
     hint: "The name literally contains the word for what it identifies.",
     correctFeedback: "Correct!",
-    incorrectFeedback: "Close, but that's a different ID technology."
+    incorrectFeedback: "Close, but that's a different ID technology.",
+    docUrl: "https://docs.paloaltonetworks.com/ngfw/administration/app-id/app-id-overview",
+    docLabel: "App-ID Overview — PAN-OS docs"
   },
   {
     id: "q3",
@@ -290,7 +306,9 @@ const questions = [
     explanation: "Security policies are evaluated top-down and the first rule that matches the traffic is applied; rule order matters significantly, which is why more specific rules should be placed above general ones.",
     hint: "Rule ordering is a common source of firewall misconfiguration.",
     correctFeedback: "That's it!",
-    incorrectFeedback: "Not quite — think about how order affects matching."
+    incorrectFeedback: "Not quite — think about how order affects matching.",
+    docUrl: "https://docs.paloaltonetworks.com/ngfw/getting-started/initial-setup-configuration-ngfws/set-up-a-basic-security-policy-for-the-ngfw",
+    docLabel: "Set Up a Basic Security Policy for the NGFW — PAN-OS docs"
   },
   {
     id: "q4",
@@ -305,7 +323,9 @@ const questions = [
     explanation: "User-ID maps IP addresses to usernames (via integrations like AD, LDAP, Terminal Server agents, or Captive Portal), allowing security policies to be written based on user or group identity.",
     hint: "The feature name matches the identifier it maps to policy.",
     correctFeedback: "Nailed it!",
-    incorrectFeedback: "Not this one — that's a related but different feature."
+    incorrectFeedback: "Not this one — that's a related but different feature.",
+    docUrl: "https://docs.paloaltonetworks.com/ngfw/administration/user-id/user-id-overview",
+    docLabel: "User-ID Overview — PAN-OS docs"
   },
   {
     id: "q5",
@@ -320,7 +340,9 @@ const questions = [
     explanation: "WildFire is Palo Alto's cloud-based (or on-prem appliance) malware analysis service that detonates unknown files in a sandbox environment to detect zero-day and targeted threats, then distributes signatures back to firewalls.",
     hint: "Think 'sandbox in the cloud'.",
     correctFeedback: "Spot on!",
-    incorrectFeedback: "Not quite — that one handles a different threat vector."
+    incorrectFeedback: "Not quite — that one handles a different threat vector.",
+    docUrl: "https://docs.paloaltonetworks.com/ngfw/getting-started/configure-your-ngfws/enable-free-wildfire-forwarding-on-the-ngfw",
+    docLabel: "Enable Free WildFire Forwarding on the NGFW — PAN-OS docs"
   },
   {
     id: "q6",
@@ -335,7 +357,9 @@ const questions = [
     explanation: "A Virtual Router is PAN-OS's Layer 3 routing instance, maintaining its own routing table and supporting static routes and dynamic routing protocols (OSPF, BGP, RIP) independent of other virtual routers on the same device.",
     hint: "Think OSI Layer 3.",
     correctFeedback: "Correct!",
-    incorrectFeedback: "Not quite — this is about routing, not sessions or interfaces."
+    incorrectFeedback: "Not quite — this is about routing, not sessions or interfaces.",
+    docUrl: "https://docs.paloaltonetworks.com/ngfw/networking/configure-virtual-routers",
+    docLabel: "Configure Virtual Routers — PAN-OS docs"
   },
   {
     id: "q7",
@@ -350,7 +374,9 @@ const questions = [
     explanation: "HA1 is the control link used for heartbeats and configuration sync, while HA2 is the data link used to sync session and forwarding state, allowing the passive firewall to take over seamlessly on failover.",
     hint: "There are two distinct HA link types with different jobs.",
     correctFeedback: "You got it!",
-    incorrectFeedback: "Not quite — HA relies on dedicated sync links."
+    incorrectFeedback: "Not quite — HA relies on dedicated sync links.",
+    docUrl: "https://docs.paloaltonetworks.com/ngfw/administration/high-availability/ha-links-and-backup-links",
+    docLabel: "HA Links and Backup Links — PAN-OS docs"
   }
 ];
 
@@ -423,7 +449,10 @@ function selectAnswer(choiceId) {
 
   const feedback = document.getElementById('feedback');
   feedback.classList.add('show', isCorrect ? 'correct-fb' : 'incorrect-fb');
-  feedback.innerHTML = `<strong>${isCorrect ? (q.correctFeedback || "That's right.") : (q.incorrectFeedback || "Not quite.")}</strong>${q.explanation}`;
+  const docLinkHtml = q.docUrl
+    ? `<a class="doc-link" href="${q.docUrl}" target="_blank" rel="noopener noreferrer">📄 ${q.docLabel || 'Read the PAN-OS documentation'}</a>`
+    : '';
+  feedback.innerHTML = `<strong>${isCorrect ? (q.correctFeedback || "That's right.") : (q.incorrectFeedback || "Not quite.")}</strong>${q.explanation}${docLinkHtml}`;
 
   document.getElementById('nextBtn').classList.add('show');
   progressFill.style.width = ((current + 1) / questions.length * 100) + '%';
